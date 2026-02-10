@@ -1,0 +1,40 @@
+{
+  "name": "@sovant/claude-code-mcp",
+  "version": "0.2.0",
+  "description": "Sovant MCP server for Claude Code - persistent project memory",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "sovant-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke": "node tests/integration/smoke.mjs",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "sovant",
+    "mcp",
+    "claude-code",
+    "memory",
+    "ai"
+  ],
+  "author": "Sovant AI",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@sovant/sdk": "^1.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
