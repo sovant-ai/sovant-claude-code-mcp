@@ -83,7 +83,7 @@ This removes the MCP registration from Claude Code. Memories already stored in S
 
 ## Help and feedback
 
-- **Issues:** [github.com/sovant-ai/sovant-claude-code-mcp/issues](https://github.com/sovant-ai/sovant-claude-code-mcp/issues)
+- **Issues:** [github.com/sovant-ai/sovant-claude-code-mcp/issues](https://github.com/sovant-ai/sovant-claude-code-mcp/issues) — please include your OS, Node version, and `claude --version`.
 - **Docs:** [sovant.ai/docs/mcp](https://sovant.ai/docs/mcp)
 
 ## License
