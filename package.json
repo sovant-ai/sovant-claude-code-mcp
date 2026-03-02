@@ -1,6 +1,6 @@
 {
   "name": "@sovant/claude-code-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Sovant MCP server for Claude Code - persistent project memory",
   "type": "module",
   "main": "dist/index.js",

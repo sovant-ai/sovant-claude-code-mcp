@@ -16,11 +16,23 @@ const DEFAULT_SEARCH_LIMIT = 10;
 const MAX_SEARCH_LIMIT = 20;
 
 /**
- * Handle /recall command — thread-scoped hybrid recall
+ * Handle /recall command — hybrid recall with optional scope/mode/debug
+ *
+ * scope="thread" (default): filters by current repo thread_id
+ * scope="global": omits thread_id for cross-project recall
+ * mode="smart" (default): full hybrid pipeline (LLM interpreter + vector + lexical)
+ * mode="exact": deterministic keyword-only recall
+ * debug=true: appends source/type counts and token estimates
+ * includeWorkspace=true: include non-dev memories (dashboard, CRM, smart capture)
+ *   Default false — MCP recall is dev-only (source:claude-code tagged) by default
  */
 export async function handleRecall(
   query: string,
   limit?: number,
+  scope?: "thread" | "global",
+  mode?: "smart" | "exact",
+  debug?: boolean,
+  includeWorkspace?: boolean,
 ): Promise<string> {
   if (!query.trim()) {
     return "Please provide a search query. Usage: /recall <question>";
@@ -33,17 +45,43 @@ export async function handleRecall(
 
   try {
     const client = getSovantClient();
-    const threadId = await getThreadId();
 
-    const result = await client.memory.recall({
+    // Build recall params — omit thread_id for global scope
+    // Default space=dev (only source:claude-code tagged memories)
+    // unless includeWorkspace=true, then space=all
+    const recallParams: any = {
       query: query.trim(),
-      thread_id: threadId,
       limit: effectiveLimit,
-    });
+      space: includeWorkspace ? "all" : "dev",
+    };
+
+    if (scope !== "global") {
+      recallParams.thread_id = await getThreadId();
+    }
+    if (mode) {
+      recallParams.mode = mode;
+    }
+
+    const result = await client.memory.recall(recallParams);
 
     const results = (result as any)?.results || [];
+    let output = formatRecallResults(results, query.trim());
 
-    return formatRecallResults(results, query.trim());
+    // Append debug block if requested
+    if (debug) {
+      const meta = (result as any)?.recall_metadata || {};
+      const spaceUsed = includeWorkspace ? "all" : "dev";
+      const bySource: Record<string, number> = {};
+      const byType: Record<string, number> = {};
+      for (const r of results) {
+        bySource[r.source || "unknown"] =
+          (bySource[r.source || "unknown"] || 0) + 1;
+        byType[r.type || "unknown"] = (byType[r.type || "unknown"] || 0) + 1;
+      }
+      output += `\n---\nDebug: scope=${scope || "thread"} mode=${mode || "smart"} space=${spaceUsed} returned=${results.length} pinned=${meta.pinned_count ?? 0} est_tokens=${meta.estimated_tokens ?? "?"} omitted=${meta.omitted_by_budget ?? 0} truncated=${meta.truncated ?? false}\n  bySource: ${JSON.stringify(bySource)}\n  byType: ${JSON.stringify(byType)}`;
+    }
+
+    return output;
   } catch (error) {
     return `Recall failed: ${formatSovantError(error)}`;
   }

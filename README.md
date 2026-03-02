@@ -65,13 +65,30 @@ Sovant should recall the memory you just saved. If both work, you're set.
 | `sovant_remember` | Save a general note or fact |
 | `sovant_remember_pref` | Save a coding preference |
 | `sovant_remember_decision` | Save an architectural decision |
-| `sovant_recall` | Retrieve relevant memories (repo-scoped) |
+| `sovant_recall` | Retrieve relevant memories (dev-only by default; supports `scope`, `mode`, `debug`, `include_workspace`) |
 | `sovant_search` | Search with explicit scope (`repo` or `global`) |
 | `sovant_memory_list` | List recent memories with short IDs |
 | `sovant_memory_show` | Show full details of a memory |
 | `sovant_memory_update` | Edit a memory's content |
 | `sovant_memory_delete` | Delete a memory |
 | `sovant_thread_info` | Show current thread ID, repo, and memory count |
+
+## Privacy default
+
+By default, `sovant_recall` only returns **dev memories** — those tagged with `source:claude-code` (i.e., memories saved through this MCP adapter). Dashboard memories, CRM records, and smart-capture data are excluded.
+
+To include all workspace memories in a recall, pass `include_workspace: true`.
+
+### Recall parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `query` | string | (required) | The search query |
+| `limit` | number | 10 | Max results (max 25) |
+| `scope` | `"thread"` \| `"global"` | `"thread"` | `thread` = current repo only; `global` = all projects |
+| `mode` | `"smart"` \| `"exact"` | `"smart"` | `smart` = hybrid AI recall; `exact` = keyword match |
+| `debug` | boolean | false | Append debug info (token counts, sources) |
+| `include_workspace` | boolean | false | Include non-dev memories (dashboard, CRM, smart capture) |
 
 ## Uninstall
 

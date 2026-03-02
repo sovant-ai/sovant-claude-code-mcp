@@ -95,6 +95,28 @@ const TOOLS: Tool[] = [
           type: "number",
           description: "Max results to return (default: 10, max: 25)",
         },
+        scope: {
+          type: "string",
+          enum: ["thread", "global"],
+          description:
+            "Search scope: 'thread' (default, current repo) or 'global' (all projects)",
+        },
+        mode: {
+          type: "string",
+          enum: ["smart", "exact"],
+          description:
+            "Recall mode: 'smart' (default, hybrid AI recall) or 'exact' (deterministic keyword match)",
+        },
+        debug: {
+          type: "boolean",
+          description:
+            "Include debug info (counts, token estimates, sources)",
+        },
+        include_workspace: {
+          type: "boolean",
+          description:
+            "Include non-dev memories (dashboard, CRM, smart capture). Default: false (dev memories only)",
+        },
       },
       required: ["query"],
     },
@@ -210,7 +232,7 @@ const TOOLS: Tool[] = [
 const server = new Server(
   {
     name: "sovant-claude-code",
-    version: "0.2.0",
+    version: "0.3.0",
   },
   {
     capabilities: {
@@ -279,6 +301,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         result = await handleRecall(
           (args as any)?.query || "",
           (args as any)?.limit,
+          (args as any)?.scope,
+          (args as any)?.mode,
+          (args as any)?.debug,
+          (args as any)?.include_workspace,
         );
         break;
 
